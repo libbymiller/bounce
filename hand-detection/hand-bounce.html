@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--
+  <link rel="stylesheet" href="https://unpkg.com/carbon-components@latest/css/carbon-components.css" />
+-->
+  <link rel="stylesheet" href="css/track.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>HTML5 Bouncing Ball</title>
+<style type="text/css">
+#container { margin:0 auto; }
+#canvas2 { background:#fff; border:1px solid #cbcbcb; }
+#myvideo {
+    /*Mirror code starts*/
+    transform: rotateY(180deg);
+    -webkit-transform:rotateY(180deg); /* Safari and Chrome */
+    -moz-transform:rotateY(180deg); /* Firefox */
+    /*Mirror code ends*/
+}
+
+.canvasbox {
+    width: 400px;
+    height: 300px;
+    border-bottom: 1px solid #0063FF;
+}
+</style>
+</head>
+<body class="bx--body p20">
+<div id="container">
+	
+	<canvas id="canvas2" width="500" height="300"></canvas>
+        <video class="videobox canvasbox" autoplay="autoplay" id="myvideo"></video>
+</div>
+<button  onclick="serveLeft()">serve left</button>
+<button onclick="serveRight()">serve right</button>
+
+  <div class="mb10">
+    <button  id="trackbutton" class="bx--btn bx--btn--secondary" type="button" disabled>
+      Toggle Video
+    </button>
+    <button id="updatenote" class="updatenote mt10">Loading model...
+    </button>
+  </div>
+
+
+<script src="js/carbon-components.js"></script>
+<script src="js/handtrack.min.js"> </script>
+
+<script type="text/javascript">
+var context2;
+var x, y, dx, dy;
+    var canvas2 = document.querySelector("#canvas2");
+    context2= canvas2.getContext('2d');
+
+    function serveLeft(){
+       console.log("left");
+       y = Math.floor(Math.random() * innerHeight/2);
+       x = 0;
+       dx = Math.floor(Math.random() * 5)+2;
+       dy = Math.floor(Math.random() * 10)+2;
+    }
+    function serveRight(){
+       console.log("right");
+       y = Math.floor(Math.random() * innerHeight/2);
+       x = innerWidth;
+       dx = -(Math.floor(Math.random() * 5)+3);
+       dy = -(Math.floor(Math.random() * 10)+3);
+    }
+
+
+    function drawBall(){
+	context2.clearRect(0,0,canvas2.width, canvas2.height);
+	context2.beginPath();
+	context2.fillStyle="#0000ff";
+	context2.arc(x,y,20,0,Math.PI*2,true);
+	context2.closePath();
+	context2.fill();
+
+//handled elsewhere
+//	if( x > canvas2.width){ 
+//          dx = -dx;
+//      }
+        if( x < 0 ){
+           serveLeft();
+        }
+	if( y < 0 || y > canvas2.height){
+            dy = -dy;
+        }
+	x+= dx;
+	y+= dy;
+    }
+setInterval(drawBall,1); 
+
+</script>
+
+  <script src="js/index.js"></script>
+
+ </body>
+</html>

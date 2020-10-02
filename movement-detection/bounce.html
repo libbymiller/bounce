@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>HTML5 Bouncing Ball</title>
+<style type="text/css">
+canvas{ border: 1px solid black; }
+</style>
+<script language="javascript" src="js/creative_coding.js"></script>
+<script language="javascript" src="js/video.js"></script>
+<script language="javascript" src="js/canvas.js"></script>
+<script language="javascript" src="js/motion_detection.js"></script>
+</head>
+<!-- based on work here https://github.com/GeorgeGally/creative_coding 
+https://www.webfx.com/blog/web-design/bouncing-a-ball-around-with-html5-and-javascript/
+-->
+<body>
+
+<button onclick="serveLeft()">serve left</button>
+<button onclick="serveRight()">serve right</button>
+
+<script type="text/javascript">
+
+// bouncing ball canvas
+
+var ballContext = createCanvas("ballCanvas",true);
+var bx, by, dx, dy;
+
+    function serveLeft(){
+       console.log("left");
+       by = Math.floor(Math.random() * innerHeight/2);
+       bx = 0;
+       dx = Math.floor(Math.random() * 5)+2;
+       dy = Math.floor(Math.random() * 10)+2;
+    }
+    function serveRight(){
+       console.log("right");
+       by = Math.floor(Math.random() * innerHeight/2);
+       bx = innerWidth;
+       dx = -(Math.floor(Math.random() * 5)+3);
+       dy = -(Math.floor(Math.random() * 10)+3);
+    }
+
+var w = 200;
+var h = 100;
+var xx = 300;
+var yy = 200;
+var bb = {x:xx,y:yy, x1:xx+w, y1:yy+h}; //shluld be abs coordinates
+
+
+    function drawBall(){
+	ballContext.clearRect(0,0,ballCanvas.width, ballCanvas.height);
+	ballContext.beginPath();
+	ballContext.fillStyle="#0000ff";
+	ballContext.arc(bx,by,20,0,Math.PI*2,true);
+	ballContext.closePath();
+	ballContext.fill();
+//        if(bx > bb.x && bx < bb.x1 && by > bb.y && by < bb.y1){
+  //            console.log("bx",bx, "by",by);
+    //    }
+	if( bx > ballCanvas.width || bx < 0){ 
+            dx = -dx;
+        }
+	if( by < 0 || by > ballCanvas.height){
+            dy = -dy;
+        }
+	bx+= dx;
+	by+= dy;
+    }
+
+
+var old = [];
+var threshold = 40;
+var scalefactor = 20;
+
+function setup(){
+  video.width = w/scalefactor;
+  video.height = h/scalefactor;
+}
+
+var ctx2 = createHiddenCanvas("canvas2",false,10,10,w/scalefactor,h/scalefactor);
+var personContext = createCanvas("person",false, bb.x,bb.y, w,h);
+
+var motions = [];
+var motions_length = 10;
+
+function getDirection(motions){
+  console.log("motions",motions);
+
+//we expect an array of x, y
+//diff the xs and the ys
+  var diffX = motions[0].x - motions[motions_length-1].x;
+  var diffY = motions[0].y - motions[motions_length-1].y;
+  //console.log("diffX",diffX,"diffY",diffY);
+  
+
+//if its x send it L or R
+//if its y send it up or down
+  x = motions[0].x;
+  x1 = motions[motions_length-1].x;
+  y = motions[0].y;
+  y1 = motions[motions_length-1].y;
+
+  var angle = (Math.atan2(x1-x, y-y1) )/ (Math.PI / 180);
+  console.log("angle",angle);
+}
+
+
+function draw(){
+  ctx2.drawImage(video, 0, 0, w, h);
+  var data = ctx2.getImageData(0, 0, w, h).data;
+
+  personContext.background(0, 0.05);
+  var motion = motionDetection(true, personContext);//reversed for me
+  if(motion.length > 0){
+    var mp = motion[0]; 
+    if(motions.length < motions_length){ 
+      motions.push(mp);
+    }else{
+      if(bx > bb.x && bx < bb.x1 && by > bb.y && by < bb.y1){
+         console.log("biff!");
+         dx = -dx;
+         dy = -dy;
+      }
+      motions = [];
+    }
+
+    for (var i = 0; i < motion.length; i++) {
+     var m = motion[i];
+     personContext.fillStyle = rgb(m.r, m.g, m.b);
+     personContext.fillEllipse(m.x, m.y, scalefactor, scalefactor);
+   }
+  }
+
+  //ball
+  drawBall();
+}
+
+
+</script>
+
+
+</body>
+</html>
+
+<!--
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" />
+
+
+-->
